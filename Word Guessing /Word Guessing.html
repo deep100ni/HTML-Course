@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guessing Game - General Knowledge</title>
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --text-color: #333;
+            --light-color: #f8f9fa;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-description {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .question-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .word-display {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .letter-box {
+            width: 40px;
+            height: 50px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: white;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        
+        .letter-box.revealed {
+            background-color: var(--success-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .letter-input {
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5600c2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1a68e5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        
+        .error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+        
+        .hint {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #856404;
+            border: 1px solid var(--warning-color);
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .attempts {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .score {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .game-over {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .game-over h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s ease-in infinite;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.1rem;
+            }
+            
+            .letter-box {
+                width: 30px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Word Guessing Game</h1>
+        <p class="game-description">Test your general knowledge! Read the clue, then guess the correct word. You have 5 attempts for each word.</p>
+        
+        <div class="score-container">
+            <div>Attempts: <span class="attempts">5</span> remaining</div>
+            <div>Score: <span class="score">0</span></div>
+        </div>
+        
+        <div class="game-area">
+            <div class="question-container">
+                <p class="question">Loading question...</p>
+                <div class="word-display"></div>
+            </div>
+            
+            <input type="text" class="letter-input" placeholder="Enter your guess">
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="check-btn">Check Answer</button>
+                <button class="btn btn-secondary" id="hint-btn">Get Hint</button>
+                <button class="btn btn-secondary" id="next-btn" disabled>Next Question</button>
+            </div>
+            
+            <div class="message hidden"></div>
+        </div>
+        
+        <div class="game-over hidden">
+            <h2>Game Over!</h2>
+            <p>Your final score: <span class="final-score">0</span></p>
+            <button class="btn btn-primary" id="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game elements
+            const questionEl = document.querySelector('.question');
+            const wordDisplayEl = document.querySelector('.word-display');
+            const inputEl = document.querySelector('.letter-input');
+            const checkBtn = document.getElementById('check-btn');
+            const hintBtn = document.getElementById('hint-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const messageEl = document.querySelector('.message');
+            const attemptsEl = document.querySelector('.attempts');
+            const scoreEl = document.querySelector('.score');
+            const finalScoreEl = document.querySelector('.final-score');
+            const gameAreaEl = document.querySelector('.game-area');
+            const gameOverEl = document.querySelector('.game-over');
+
+            // Game data
+            const questions = [
+                {
+                    question: "The closest star to Earth",
+                    answer: "SUN",
+                    hint: "It's at the center of our solar system"
+                },
+                {
+                    question: "The largest ocean on Earth",
+                    answer: "PACIFIC",
+                    hint: "It covers more than 30% of Earth's surface"
+                },
+                {
+                    question: "Element with the symbol 'O'",
+                    answer: "OXYGEN",
+                    hint: "You need it to breathe"
+                },
+                {
+                    question: "The 'Red Planet' in our solar system",
+                    answer: "MARS",
+                    hint: "Named after the Roman god of war"
+                },
+                {
+                    question: "Tallest mountain on Earth",
+                    answer: "EVEREST",
+                    hint: "Located in the Himalayas"
+                },
+                {
+                    question: "Country known as the 'Land of the Rising Sun'",
+                    answer: "JAPAN",
+                    hint: "Famous for sushi and samurai culture"
+                },
+                {
+                    question: "Most abundant gas in Earth's atmosphere",
+                    answer: "NITROGEN",
+                    hint: "Makes up about 78% of our air"
+                },
+                {
+                    question: "Largest mammal on Earth",
+                    answer: "BLUEWHALE",
+                    hint: "Can weigh as much as 200 tons"
+                },
+                {
+                    question: "Chemical symbol for gold",
+                    answer: "AU",
+                    hint: "Derived from the Latin word 'aurum'"
+                },
+                {
+                    question: "The human body has 206 of these",
+                    answer: "BONES",
+                    hint: "They form your skeleton"
+                },
+                {
+                    question: "Unit used to measure earthquake strength",
+                    answer: "RICHTER",
+                    hint: "It's a logarithmic scale"
+                },
+                {
+                    question: "Planet with the most moons",
+                    answer: "SATURN",
+                    hint: "Known for its prominent rings"
+                },
+                {
+                    question: "Largest organ in the human body",
+                    answer: "SKIN",
+                    hint: "It covers your entire body"
+                },
+                {
+                    question: "The process by which plants make food",
+                    answer: "PHOTOSYNTHESIS",
+                    hint: "Uses sunlight, water, and carbon dioxide"
+                },
+                {
+                    question: "Dinosaur known for its three horns",
+                    answer: "TRICERATOPS",
+                    hint: "Lived during the Late Cretaceous period"
+                }
+            ];
+
+            // Game state
+            let currentQuestionIndex = 0;
+            let currentWord = '';
+            let revealedLetters = [];
+            let attempts = 5;
+            let score = 0;
+            let gameActive = true;
+            let hintsUsed = 0;
+
+            // Initialize game
+            function initGame() {
+                currentQuestionIndex = 0;
+                score = 0;
+                gameActive = true;
+                hintsUsed = 0;
+                
+                scoreEl.textContent = score;
+                gameAreaEl.classList.remove('hidden');
+                gameOverEl.classList.add('hidden');
+                
+                loadQuestion();
+            }
+
+            // Load question
+            function loadQuestion() {
+                if (currentQuestionIndex >= questions.length) {
+                    endGame();
+                    return;
+                }
+                
+                const questionData = questions[currentQuestionIndex];
+                currentWord = questionData.answer;
+                revealedLetters = Array(currentWord.length).fill(false);
+                attempts = 5;
+                
+                questionEl.textContent = questionData.question;
+                attemptsEl.textContent = attempts;
+                
+                renderWordDisplay();
+                clearMessage();
+                
+                inputEl.value = '';
+                inputEl.focus();
+                inputEl.disabled = false;
+                checkBtn.disabled = false;
+                hintBtn.disabled = false;
+                nextBtn.disabled = true;
+            }
+
+            // Render word display
+            function renderWordDisplay() {
+                wordDisplayEl.innerHTML = '';
+                
+                for (let i = 0; i < currentWord.length; i++) {
+                    const letterBox = document.createElement('div');
+                    letterBox.classList.add('letter-box');
+                    
+                    if (revealedLetters[i]) {
+                        letterBox.textContent = currentWord[i];
+                        letterBox.classList.add('revealed');
+                    }
+                    
+                    wordDisplayEl.appendChild(letterBox);
+                }
+            }
+
+            // Check answer
+            function checkAnswer() {
+                const guess = inputEl.value.trim().toUpperCase();
+                
+                if (!guess) {
+                    showMessage('Please enter your guess', 'error');
+                    return;
+                }
+                
+                if (guess === currentWord) {
+                    // Correct answer
+                    revealWord();
+                    const pointsEarned = 10 + (attempts * 2) - (hintsUsed * 2);
+                    score += Math.max(pointsEarned, 1); // Minimum 1 point
+                    
+                    scoreEl.textContent = score;
+                    showMessage(`Correct! You earned ${pointsEarned} points.`, 'success');
+                    
+                    inputEl.disabled = true;
+                    checkBtn.disabled = true;
+                    hintBtn.disabled = true;
+                    nextBtn.disabled = false;
+                    
+                    // Create confetti effect for correct answer
+                    createConfetti();
+                } else {
+                    // Wrong answer
+                    attempts--;
+                    attemptsEl.textContent = attempts;
+                    
+                    if (attempts <= 0) {
+                        revealWord();
+                        showMessage(`Out of attempts! The answer was "${currentWord}".`, 'error');
+                        
+                        inputEl.disabled = true;
+                        checkBtn.disabled = true;
+                        hintBtn.disabled = true;
+                        nextBtn.disabled = false;
+                    } else {
+                        showMessage(`Incorrect! You have ${attempts} attempts left.`, 'error');
+                    }
+                }
+                
+                inputEl.value = '';
+                inputEl.focus();
+            }
+
+            // Reveal the entire word
+            function revealWord() {
+                revealedLetters = Array(currentWord.length).fill(true);
+                renderWordDisplay();
+            }
+
+            // Show message
+            function showMessage(text, type) {
+                messageEl.textContent = text;
+                messageEl.className = 'message ' + type;
+                messageEl.classList.remove('hidden');
+            }
+
+            // Clear message
+            function clearMessage() {
+                messageEl.classList.add('hidden');
+            }
+
+            // Get hint
+            function getHint() {
+                const questionData = questions[currentQuestionIndex];
+                showMessage(`Hint: ${questionData.hint}`, 'hint');
+                hintsUsed++;
+                
+                // Reveal a random letter
+                const hiddenIndices = [];
+                for (let i = 0; i < revealedLetters.length; i++) {
+                    if (!revealedLetters[i]) {
+                        hiddenIndices.push(i);
+                    }
+                }
+                
+                if (hiddenIndices.length > 0) {
+                    const randomIndex = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
+                    revealedLetters[randomIndex] = true;
+                    renderWordDisplay();
+                }
+                
+                // Disable hint button after use
+                hintBtn.disabled = true;
+            }
+
+            // Next question
+            function nextQuestion() {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+
+            // End game
+            function endGame() {
+                gameAreaEl.classList.add('hidden');
+                gameOverEl.classList.remove('hidden');
+                finalScoreEl.textContent = score;
+            }
+
+            // Create confetti effect
+            function createConfetti() {
+                const confettiCount = 100;
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.opacity = Math.random() + 0.5;
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    confetti.style.animationDelay = Math.random() * 5 + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+            }
+
+            // Event listeners
+            checkBtn.addEventListener('click', checkAnswer);
+            
+            hintBtn.addEventListener('click', getHint);
+            
+            nextBtn.addEventListener('click', nextQuestion);
+            
+            restartBtn.addEventListener('click', initGame);
+            
+            inputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !checkBtn.disabled) {
+                    checkAnswer();
+                }
+            });
+
+            // Start the game
+            initGame();
+        });
+    </script>
+</body>
+</html>
